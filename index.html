@@ -74,18 +74,28 @@ const CharData = [
 	{ id:'rina'   , name:'璃奈'  , r:207, g:208, b:227 }
 ];
 
-function SetBGColor(x){
-	for(i=0; i<9; i++){
-		var ClassToChange = document.getElementsByClassName(CharData[i].id);
-		for(j=0; j<ClassToChange.length; j++){
-			ClassToChange[j].style.color = ((i==x || x==-1) ? 'black' : '#ccc');
-			ClassToChange[j].style.backgroundColor = 
-			'rgba(' + CharData[i].r + ',' + CharData[i].g + ',' + CharData[i].b + ','
-			+ ((i==x || x==-1) ? 1 : 0.2) + ')';
-		}
-	}
-	return 0;
+var CharHighlighted = [1,1,1,1,1,1,1,1,1];
 
+function SetBGColor(x){
+	switch(x){
+		case -1:
+		for(i=0; i<9; i++){
+			CharHighlighted[i] = 0;
+			SetBGColor(i);
+		}
+		return 0;
+
+		default:
+		var ClassToChange = document.getElementsByClassName(CharData[x].id);
+		CharHighlighted[x] = 1-CharHighlighted[x];
+		for(j=0; j<ClassToChange.length; j++){
+			ClassToChange[j].style.color = (CharHighlighted[x] ? 'black' : '#ccc');
+			ClassToChange[j].style.backgroundColor = 
+			'rgba(' + CharData[x].r + ',' + CharData[x].g + ',' + CharData[x].b + ','
+			+ (CharHighlighted[x] ? 1 : 0.2) + ')';
+		}
+		return 0;
+	}
 }
 
 --></script>
@@ -94,7 +104,7 @@ function SetBGColor(x){
 <body>
 
 <table id="ranking">
-<thead onMouseOver="SetBGColor(-1)">
+<thead onClick="SetBGColor(-1)">
 <tr>
 	<th>日時/順位</th>
 	<td>1位</td>
@@ -113,22 +123,28 @@ function SetBGColor(x){
 document.write('<tbody>\n');
 for(i in RankingData){
 	var CharID = 0;
-	document.write('<tr><th onMouseOver="SetBGColor(-1)">' + RankingData[i][9] + '</th>\n');
+	document.write('<tr><th onClick="SetBGColor(-1)">' + RankingData[i][9] + '</th>\n');
 	for(j=0; j<9; j++){
 		CharID = RankingData[i][j];
-		document.write('<td class="' + CharData[CharID].id + '" onMouseOver="SetBGColor(' + CharID + ')">'
+		document.write('<td class="' + CharData[CharID].id + '" style="background-color:rgb('
+		 + CharData[CharID].r + ',' + CharData[CharID].g + ',' + CharData[CharID].b
+		 + ');" onClick="SetBGColor(' + CharID + ')">'
 		 + CharData[CharID].name + '</td>');
 	}
 	document.write('</tr>\n');
 }
 document.write('</tbody>\n');
-SetBGColor(-1);
+//SetBGColor(-1);
 --></script>
 </table>
 
 <p>
-	キャラクター名のセルの上にマウスを乗せるorタップすると、そのキャラクターがハイライトされます。<br>
-	キャラクター以外のセルにマウスを乗せるorタップすることで解除されます。
+	キャラクター名のセルをクリック/タップすると、そのキャラクター色の表示/非表示を切り替えます。<br>
+	キャラクター以外のセルをクリック/タップするとリセット。
+</p>
+<p>
+	2019/03/18 17:30頃 公開<br>
+	2019/03/20 20:30頃 「セルをクリック/タップ」でトグルするように仕様変更<br>
 </p>
 </body>
 </html>
