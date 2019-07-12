@@ -5,37 +5,42 @@
 <title>虹ヶ咲学園スクールアイドル同好会 マンスリーランキングまとめ</title>
 <style><!--
 
-#ranking { 
+table { 
 	margin: 10px;
 	border: solid 3px rgb(226,6,126);
 	border-collapse: collapse;
 	text-align: center;
 }
 
-#ranking td,th {
+table td,th {
 	padding: 2px 5px;
 }
 
-#ranking thead {
+table thead {
 	border-bottom: solid 2px rgb(226,6,126);
 }
 
-#ranking thead th{
+table thead th{
 	background-color: rgba(226, 006, 126, 0.4);
 }
 
-#ranking thead td{
+table thead td{
 	background-color: rgba(241, 149, 14, 0.3);
 }
 
-#ranking tbody th{
+table tbody th{
 	background-color: rgba(241, 149, 14, 0.3);
 }
 
-#ranking tbody th,td {
+table tbody th,td {
 	border-right: solid 1px #ccc;
 	border-bottom: solid 1px #ccc;
 }
+
+#MainArea_1 {
+	text-align:center;
+}
+
 
 --></style>
 <script><!--
@@ -67,21 +72,45 @@ const RankingData = [
 ];
 
 const CharData = [
-	{ id:'ayumu'  , name:'歩夢'  , r:237, g:197, b:206 },
-	{ id:'kasumi' , name:'かすみ', r:232, g:224, b:137 },
-	{ id:'shizuku', name:'しずく', r:190, g:224, b:237 },
-	{ id:'karin'  , name:'果林'  , r:192, g:202, b:250 },
-	{ id:'ai'     , name:'愛'    , r:253, g:183, b:146 },
-	{ id:'kanata' , name:'彼方'  , r:211, g:184, b:229 },
-	{ id:'setsuna', name:'せつ菜', r:249, g:166, b:170 },
-	{ id:'emma'   , name:'エマ'  , r:200, g:237, b:190 },
-	{ id:'rina'   , name:'璃奈'  , r:207, g:208, b:227 }
+	{ id:'ayumu'  , name:'歩夢'  , color:'rgb(237, 197, 206)' },
+	{ id:'kasumi' , name:'かすみ', color:'rgb(232, 224, 137)' },
+	{ id:'shizuku', name:'しずく', color:'rgb(190, 224, 237)' },
+	{ id:'karin'  , name:'果林'  , color:'rgb(192, 202, 250)' },
+	{ id:'ai'     , name:'愛'    , color:'rgb(253, 183, 146)' },
+	{ id:'kanata' , name:'彼方'  , color:'rgb(211, 184, 229)' },
+	{ id:'setsuna', name:'せつ菜', color:'rgb(249, 166, 170)' },
+	{ id:'emma'   , name:'エマ'  , color:'rgb(200, 237, 190)' },
+	{ id:'rina'   , name:'璃奈'  , color:'rgb(207, 208, 227)' }
 ];
 
-var CharHighlighted = [1,1,1,1,1,1,1,1,1];
+const MatchResultData = [[],[],[],[],[],[],[],[],[]];
+function CreateMatchResult(){
+	for(member=0; member<9; member++){ //キャラ
+		MatchResultData[member] = [0,0,0,0,0,0,0,0,0,0];
+		for(month=0; month<RankingData.length; month++){ //月
+			var TargetMemberRank = 999;
+			for(rank=0; rank<9; rank++){
+				if(RankingData[month][rank] == member){
+					TargetMemberRank = rank;
+				}else{
+					if(TargetMemberRank != 999){
+						MatchResultData[member][RankingData[month][rank]]++;
+						MatchResultData[member][9]++;
+					}
+				}
+			}
+			if(TargetMemberRank == 999){ //見つからなかった場合
+				alert("エラー：順位設定ミス？\n" + RankingData[month][9] + " に " + CharData[member].name + "が含まれていません");
+				return;
+			}
+		}
+	}
+}
 
-function SetBGColor(x){
-	switch(x){
+CreateMatchResult();
+var CharHighlighted = [1,1,1,1,1,1,1,1,1];
+function SetBGColor(z){
+	switch(z){
 		case -1:
 		for(i=0; i<9; i++){
 			CharHighlighted[i] = 0;
@@ -90,13 +119,10 @@ function SetBGColor(x){
 		return 0;
 
 		default:
-		var ClassToChange = document.getElementsByClassName(CharData[x].id);
-		CharHighlighted[x] = 1-CharHighlighted[x];
+		var ClassToChange = document.getElementsByClassName(CharData[z].id);
+		CharHighlighted[z] = 1-CharHighlighted[z];
 		for(j=0; j<ClassToChange.length; j++){
-			ClassToChange[j].style.color = (CharHighlighted[x] ? 'black' : '#ccc');
-			ClassToChange[j].style.backgroundColor = 
-			'rgba(' + CharData[x].r + ',' + CharData[x].g + ',' + CharData[x].b + ','
-			+ (CharHighlighted[x] ? 1 : 0.2) + ')';
+			ClassToChange[j].style.opacity = (CharHighlighted[z] ? 1 : 0.25);
 		}
 		return 0;
 	}
@@ -107,46 +133,80 @@ function SetBGColor(x){
 </head>
 <body>
 
-<table id="ranking">
-<thead onClick="SetBGColor(-1)">
-<tr>
-	<th>日時/順位</th>
-	<td>1位</td>
-	<td>2位</td>
-	<td>3位</td>
-	<td>4位</td>
-	<td>5位</td>
-	<td>6位</td>
-	<td>7位</td>
-	<td>8位</td>
-	<td>9位</td>
-</tr>
-</thead>
+<div id="MainArea">
+	<div style="text-align:center">
+	<span style="font-size: 150%">よみこみちゅう…</span><br>
+	このコンテンツはJavaScriptを使用しています。<br>
+	いつまで待ってもこの表示が消えない場合、JavaScriptがオフになっている可能性があります。<br>
+	お手数ですが、JavaScriptの実行を許可した上でページを読み込み直してください。<br>
+	</div>
+</div>
 
-<script><!--
-document.write('<tbody>\n');
+<script><!-- 
+//■■ 順位結果 ■■
+//■ ヘッダー
+Output = '<div id="MonthlyRanking"><h3>マンスリーランキングまとめ</h3>'
+	+ '<table id="ranking">\n<thead onClick="SetBGColor(-1)">\n'
+	+ '<tr><th>日時/順位</th>';
+	for(i=0; i<9; i++){
+		Output += '<td>' + (i+1) + '位</td>';
+	}
+Output += '</tr></thead>\n';
+
+//■ マンスリーランキング
+Output += '<tbody>\n';
 for(i in RankingData){
 	var CharID = 0;
-	document.write('<tr><th onClick="SetBGColor(-1)">' + RankingData[i][9] + '</th>\n');
+	Output += '<tr><th onClick="SetBGColor(-1)">' + RankingData[i][9] + '</th>\n';
 	for(j=0; j<9; j++){
 		CharID = RankingData[i][j];
-		document.write('<td class="' + CharData[CharID].id + '" style="background-color:rgb('
-		 + CharData[CharID].r + ',' + CharData[CharID].g + ',' + CharData[CharID].b
-		 + ');" onClick="SetBGColor(' + CharID + ')">'
-		 + CharData[CharID].name + '</td>');
+		Output += '<td class="' + CharData[CharID].id
+		+ '" style="background-color:' + CharData[CharID].color
+		+ ';" onClick="SetBGColor(' + CharID + ')">' + CharData[CharID].name + '</td>';
 	}
-	document.write('</tr>\n');
+	Output += '</tr>\n'
 }
-document.write('</tbody>\n');
-//SetBGColor(-1);
---></script>
-</table>
+Output += '</tbody>\n</table\n>'
+	+ '<p>キャラクター名のセルをクリック/タップすると、そのキャラクター色の表示/非表示を切り替えます。<br>'
+	+ 'キャラクター以外のセルをクリック/タップするとリセット。</p></div>\n<hr>\n'
 
+//■■ 勝敗表 ■■
+//■ ヘッダー
+Output += '<div id="MatchResult"><h3>勝敗表</h3>'
+	+ '<table id="MatchTable">\n<thead>\n<tr><th>勝敗表</th>';
+
+for(x=0; x<9; x++){
+	Output += '<td class="caption_' + CharData[x].id +'" width="50px" style="background-color:'
+	+ CharData[x].color + '">' + CharData[x].name + '</td>\n';
+}
+Output += '<th width="50px">合計</th><th>平均順位</th></tr></tbody></thead>\n';
+
+//■ メイン
+for(y=0; y<9; y++){
+	Output += '<tr><td class="caption_' + CharData[y].id +'" width="50px" style="background-color:'
+	+ CharData[y].color + '">'	+ CharData[y].name + '</td>\n';
+
+	for(x=0; x<9; x++){
+		Output += '<td style="background-color:'
+		+ (x==y ? ' #999">&nbsp;' : 'hsl(' + (MatchResultData[y][x]*120/RankingData.length) + ',100%,'
+		+ (95-MatchResultData[y][x]*50/RankingData.length) + '%">' + MatchResultData[y][x])
+		+ '</td>';
+	}
+	Output += '<th style="background-color:' + CharData[y].color + '">' + MatchResultData[y][9] + '</th>';
+	Output += '<th style="background-color:' + CharData[y].color + '">'
+	+ (9-(MatchResultData[y][9] / RankingData.length)).toFixed(2) + '</th></tr>\n';
+}
+Output += '</tbody>\n</table\n>'
+	+ '<p>メンバー同士の比較です。数字は対象メンバーよりも上位になった回数。</p>\n\n'
+
+
+
+document.getElementById("MainArea").innerHTML = Output;
+--></script>
+
+<hr>
 <p>
-	キャラクター名のセルをクリック/タップすると、そのキャラクター色の表示/非表示を切り替えます。<br>
-	キャラクター以外のセルをクリック/タップするとリセット。
-</p>
-<p>
+	2019/07/13 01:00頃 勝敗表を追加。JavaScriptが実行できない時のメッセージを追加<br>
 	2019/03/18 17:30頃 公開<br>
 	2019/03/20 20:30頃 「セルをクリック/タップ」でトグルするように仕様変更<br>
 </p>
