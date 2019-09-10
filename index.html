@@ -6,7 +6,7 @@
 <meta name="twitter:site" content="@ratius55">
 <meta name="twitter:creator" content="@ratius55">
 <meta name="twitter:title" content="虹ヶ咲学園スクールアイドル同好会 マンスリーランキングまとめ">
-<meta name="twitter:description" content="毎月開催されている「虹ヶ咲学園スクールアイドル」のランキングデータの保管所です。">
+<meta name="twitter:description" content="「虹ヶ咲学園スクールアイドル　マンスリーランキング」データの非公式保管所です。">
 <meta name="twitter:image" content="./card.png">
 <title>虹ヶ咲学園スクールアイドル同好会 マンスリーランキングまとめ</title>
 <style><!--
@@ -75,7 +75,8 @@ const RankingData = [
 [4,6,3,0,1,7,2,8,5, "2019年4月" ],
 [6,3,8,4,5,1,0,2,7, "2019年5月" ],
 [6,0,3,1,4,5,2,8,7, "2019年6月" ],
-[6,5,3,0,7,1,4,8,2, "2019年7月" ]
+[6,5,3,0,7,1,4,8,2, "2019年7月" ],
+[6,5,3,0,2,1,4,7,8, "2019年8月" ]
 ];
 
 const CharData = [
@@ -91,14 +92,19 @@ const CharData = [
 ];
 
 const MatchResultData = [[],[],[],[],[],[],[],[],[]];
+const TotalRank = [[],[],[],[],[],[],[],[],[]];
+let MostFrequent = 0;
 function CreateMatchResult(){
 	for(member=0; member<9; member++){ //キャラ
-		MatchResultData[member] = [0,0,0,0,0,0,0,0,0,0];
+		MatchResultData[member] = [0,0,0,0,0,0,0,0,0,0]; //初期化
+		TotalRank[member] = [0,0,0,0,0,0,0,0,0,0]; //初期化
 		for(month=0; month<RankingData.length; month++){ //月
 			var TargetMemberRank = 999;
 			for(rank=0; rank<9; rank++){
 				if(RankingData[month][rank] == member){
 					TargetMemberRank = rank;
+					TotalRank[member][rank] ++;
+					if(TotalRank[member][rank] > MostFrequent){ MostFrequent++; }
 				}else{
 					if(TargetMemberRank != 999){
 						MatchResultData[member][RankingData[month][rank]]++;
@@ -152,19 +158,19 @@ function SetBGColor(z){
 <script><!-- 
 //■■ 順位結果 ■■
 //■ ヘッダー
-Output = '<div id="MonthlyRanking"><h3>マンスリーランキングまとめ<\/h3>'
+Output = '\n<div id="MonthlyRanking">\n<h3>マンスリーランキングまとめ<\/h3>\n'
 	+ '<table id="ranking">\n<thead onClick="SetBGColor(-1)">\n'
 	+ '<tr><th>日時/順位<\/th>';
 	for(i=0; i<9; i++){
 		Output += '<td>' + (i+1) + '位<\/td>';
 	}
-Output += '<\/tr><\/thead>\n';
+Output += '<\/tr>\n<\/thead>\n';
 
 //■ マンスリーランキング
 Output += '<tbody>\n';
 for(i in RankingData){
 	var CharID = 0;
-	Output += '<tr><th onClick="SetBGColor(-1)">' + RankingData[i][9] + '<\/th>\n';
+	Output += '<tr><th onClick="SetBGColor(-1)">' + RankingData[i][9] + '<\/th>';
 	for(j=0; j<9; j++){
 		CharID = RankingData[i][j];
 		Output += '<td class="' + CharData[CharID].id
@@ -177,45 +183,72 @@ Output += '<\/tbody>\n<\/table\n>'
 	+ '<p>キャラクター名のセルをクリック/タップすると、そのキャラクター色の表示/非表示を切り替えます。<br>'
 	+ 'キャラクター以外のセルをクリック/タップするとリセット。<\/p><\/div>\n<hr>\n'
 
-//■■ 勝敗表 ■■
+
+
+//■■ 順位経験回数 ■■
 //■ ヘッダー
-Output += '<div id="MatchResult"><h3>勝敗表<\/h3>'
-	+ '<table id="MatchTable">\n<thead>\n<tr><th>勝敗表<\/th>';
+Output += '<div id="AcquiredRank"><h3>順位経験回数<\/h3>\n'
+	+ '<table id="AcquiredRankTable">\n<thead>\n<tr><th style="width:60px;">順位<\/th>';
 
 for(x=0; x<9; x++){
-	Output += '<td class="caption_' + CharData[x].id +'" width="50px" style="background-color:'
-	+ CharData[x].color + '">' + CharData[x].name + '<\/td>\n';
+	Output += '<td style="width:50px; background-color:'
+	+ (x<3 ? ['#fd5', '#bbb', '#ca9'][x] : '#fde') + '">' + (x+1) + '位<\/td>\n';
 }
-Output += '<th width="50px">合計<\/th><th>平均順位<\/th><\/tr><\/tbody><\/thead>\n';
+Output += '<th style="width:70px;">平均順位<\/th><\/tr>\n<\/thead>\n<tbody>\n';
 
 //■ メイン
 for(y=0; y<9; y++){
-	Output += '<tr><td class="caption_' + CharData[y].id +'" width="50px" style="background-color:'
-	+ CharData[y].color + '">'	+ CharData[y].name + '<\/td>\n';
+	Output += '<tr><td class="caption_' + CharData[y].id +'" style="width:50px; background-color: '
+	+ CharData[y].color + '">'	+ CharData[y].name + '<\/td>';
 
 	for(x=0; x<9; x++){
 		Output += '<td style="background-color:'
-		+ (x==y ? ' #999">&nbsp;' : 'hsl(' + (MatchResultData[y][x]*120/RankingData.length) + ',100%,'
-		+ (95-MatchResultData[y][x]*50/RankingData.length) + '%">' + MatchResultData[y][x])
-		+ '<\/td>';
+		+ 'hsl(' + (TotalRank[y][x]*150/MostFrequent) + ',100%,'
+		+ (98-TotalRank[y][x]*60/MostFrequent) + '%)">' + TotalRank[y][x] + '<\/td>';
 	}
-	Output += '<th style="background-color:' + CharData[y].color + '">' + MatchResultData[y][9] + '<\/th>';
 	Output += '<th style="background-color:' + CharData[y].color + '">'
 	+ (9-(MatchResultData[y][9] / RankingData.length)).toFixed(2) + '<\/th><\/tr>\n';
 }
 Output += '<\/tbody>\n<\/table\n>'
-	+ '<p>メンバー同士の比較です。数字は対象メンバーよりも上位になった回数。<\/p>\n\n'
+	+ '<p>メンバー別の、獲得した順位の回数です。<\/p>\n<hr>\n'
 
 
+
+//■■ 勝敗表 ■■
+//■ ヘッダー
+Output += '<div id="MatchResult"><h3>勝敗表<\/h3>\n'
+	+ '<table id="MatchTable">\n<thead>\n<tr><th style="width:60px;">勝敗表<\/th>';
+
+for(x=0; x<9; x++){
+	Output += '<td class="caption_' + CharData[x].id +'" style="width:50px; background-color: '
+	+ CharData[x].color + '">' + CharData[x].name + '<\/td>\n';
+}
+Output += '<th style="width:70px;">勝数合計<\/th><\/tr>\n<\/thead>\n<tbody>\n';
+
+//■ メイン
+for(y=0; y<9; y++){
+	Output += '<tr><td class="caption_' + CharData[y].id +'" style="width: 50px; background-color: '
+	+ CharData[y].color + '">'	+ CharData[y].name + '<\/td>';
+
+	for(x=0; x<9; x++){
+		Output += '<td style="background-color:'
+		+ (x==y ? ' #999">' : 'hsl(' + (MatchResultData[y][x]*150/RankingData.length) + ',100%,'
+		+ (98-MatchResultData[y][x]*60/RankingData.length) + '%)">' + MatchResultData[y][x]) + '<\/td>';
+	}
+	Output += '<th style="background-color:' + CharData[y].color + '">' + MatchResultData[y][9] + '<\/th>\n';
+}
+Output += '<\/tbody>\n<\/table\n>'
+	+ '<p>メンバー同士の比較です。数字は対象メンバーよりも上位になった回数。<\/p>\n'
 
 document.getElementById("MainArea").innerHTML = Output;
 --></script>
 
 <hr>
 <p>
-	2019/07/13 01:00頃 勝敗表を追加。JavaScriptが実行できない時のメッセージを追加<br>
-	2019/03/18 17:30頃 公開<br>
+	2019/08/11 01:00頃 「順位経験回数」を追加<br>
+	2019/07/13 01:00頃 「勝敗表」を追加。JavaScriptが実行できない時のメッセージを追加<br>
 	2019/03/20 20:30頃 「セルをクリック/タップ」でトグルするように仕様変更<br>
+	2019/03/18 17:30頃 公開<br>
 </p>
 </body>
 </html>
